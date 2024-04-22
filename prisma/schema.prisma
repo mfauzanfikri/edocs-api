@@ -1,0 +1,46 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id       Int    @id @default(autoincrement())
+  username String @unique
+  password String
+
+  Document Document[]
+
+  @@map("user")
+}
+
+model Document {
+  id          Int       @id @default(autoincrement())
+  userId      Int       @map("user_id")
+  name        String
+  path        String
+  isShareable Boolean   @default(false) @map("is_shareable")
+  uploadedAt  DateTime  @default(now()) @map("uploaded_at")
+  updatedAt   DateTime? @updatedAt @map("updated_at")
+
+  User User @relation(fields: [userId], references: [id])
+
+  @@map("document")
+}
+
+model DocumnetSharing {
+  documentId Int @map("document_id")
+  userId     Int @map("user_id")
+
+  @@id([documentId, userId])
+  @@map("document_sharing")
+}
