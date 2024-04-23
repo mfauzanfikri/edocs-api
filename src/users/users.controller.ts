@@ -1,28 +1,56 @@
-import { Controller, Get, Post, Body, Param } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  NotFoundException,
+  ConflictException,
+  UseGuards,
+} from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
+import { JwtAuthGuard } from 'src/auth/guards/jwt.guard';
 
 @Controller('users')
+@UseGuards(JwtAuthGuard)
 export class UsersController {
   constructor(private readonly userService: UsersService) {}
 
   @Post()
   async create(@Body() createUserDto: CreateUserDto) {
-    return await this.userService.create(createUserDto);
+    try {
+      const createdUser = await this.userService.create(createUserDto);
+
+      return {
+        data: createdUser,
+      };
+    } catch (error) {
+      throw new ConflictException('user already exists');
+    }
   }
 
   @Get()
   async findAll() {
-    return await this.userService.findAll();
+    const users = await this.userService.findAll();
+    return {
+      data: users,
+    };
   }
 
   @Get(':id')
-  async findOne(@Param('id') id: string) {
+  async find(@Param('id') id: string) {
     const user = await this.userService.findById(+id);
 
+    if (!user) {
+      throw new NotFoundException('user not found');
+    }
+
     return {
-      id: user.id,
-      username: user.username,
+      data: {
+        id: user.id,
+        username: user.username,
+      },
     };
   }
 }

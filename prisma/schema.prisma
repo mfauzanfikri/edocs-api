@@ -18,7 +18,8 @@ model User {
   username String @unique
   password String
 
-  Document Document[]
+  Document       Document[]
+  SharedDocument SharedDocument[]
 
   @@map("user")
 }
@@ -27,19 +28,23 @@ model Document {
   id          Int       @id @default(autoincrement())
   userId      Int       @map("user_id")
   name        String
-  path        String
+  path        String?
   isShareable Boolean   @default(false) @map("is_shareable")
   uploadedAt  DateTime  @default(now()) @map("uploaded_at")
   updatedAt   DateTime? @updatedAt @map("updated_at")
 
-  User User @relation(fields: [userId], references: [id])
+  User           User             @relation(fields: [userId], references: [id])
+  SharedDocument SharedDocument[]
 
   @@map("document")
 }
 
-model DocumnetSharing {
+model SharedDocument {
   documentId Int @map("document_id")
   userId     Int @map("user_id")
+
+  User     User     @relation(fields: [userId], references: [id])
+  Document Document @relation(fields: [documentId], references: [id])
 
   @@id([documentId, userId])
   @@map("document_sharing")
