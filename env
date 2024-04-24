@@ -1,0 +1,4 @@
+DATABASE_URL="postgresql://postgres:postgres@localhost:5432/edocs?schema=public"
+
+# jwt
+ACCESS_TOKEN_SECRET=889fca6f0ff250818e100e8f0e76c2d0af87e55ad3d8433b55f1d65f1c98b9ce
